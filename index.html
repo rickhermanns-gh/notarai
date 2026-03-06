@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NotariAI — Backoffice Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Montserrat', sans-serif; background: #f4f6fb; min-height: 100vh; display: flex; flex-direction: column; }
+  :root {
+    --blue: #204C8D;
+    --blue-light: #1a3d70;
+    --blue-pale: #eef2f9;
+    --blue-bg: #e8eef8;
+    --accent: #c8a84b;
+  }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  /* HEADER */
+  #header {
+    background: var(--blue);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  #header-brand { padding: 18px 0; flex: 1; }
+  #header-brand .title { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px; font-family: 'Playfair Display', serif; }
+  #header-brand .subtitle { font-size: 11px; font-weight: 600; color: #a8c0e8; text-transform: uppercase; letter-spacing: 2px; margin-left: 10px; }
+  #header-brand .office { font-size: 11px; color: #7090c0; margin-top: 3px; }
+
+  /* TABS */
+  #tabs { display: flex; gap: 0; }
+  .tab-btn {
+    padding: 18px 18px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #90aacc;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    transition: all 0.15s;
+    min-width: 110px;
+  }
+  .tab-btn.active { background: rgba(255,255,255,0.12); border-bottom: 3px solid var(--accent); color: #fff; }
+  .tab-btn .tab-icon { font-size: 16px; }
+  .tab-btn .tab-sub { font-size: 9px; font-weight: 500; opacity: 0.8; }
+
+  /* CONTENT */
+  #content { padding: 28px 32px; flex: 1; }
+  .page-title { font-size: 18px; font-weight: 800; color: #1a1a2e; }
+  .page-desc { font-size: 12px; color: #888; margin-top: 4px; margin-bottom: 20px; }
+
+  /* PANELS */
+  .two-col { display: flex; gap: 24px; align-items: flex-start; }
+  .panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px;
+    border: 1px solid #dde4f0;
+    flex: 1;
+  }
+  .panel-result {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px;
+    border: 2px solid var(--blue);
+    flex: 1.2;
+  }
+  .panel-empty {
+    background: var(--blue-bg);
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+    color: #8899bb;
+    font-size: 13px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1.2;
+  }
+  .panel-empty .big-icon { font-size: 36px; margin-bottom: 12px; }
+  .panel-empty .empty-title { font-weight: 600; }
+  .panel-empty .empty-sub { font-size: 12px; margin-top: 8px; }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+  .result-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 14px;
+  }
+
+  /* FORM ELEMENTS */
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 7px;
+    border: 1.5px solid #d0d8ec;
+    font-size: 13px;
+    font-family: 'Montserrat', sans-serif;
+    outline: none;
+    color: #1a1a2e;
+    background: #fff;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--blue); }
+  .field textarea { resize: vertical; line-height: 1.6; }
+
+  /* BUTTONS */
+  .btn-primary {
+    width: 100%;
+    padding: 12px 0;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s;
+  }
+  .btn-primary:disabled { background: #8fa8d0; cursor: default; }
+  .btn-primary:hover:not(:disabled) { background: var(--blue-light); }
+  .btn-secondary {
+    margin-top: 16px;
+    padding: 8px 18px;
+    background: var(--blue-bg);
+    color: var(--blue);
+    border: 1.5px solid var(--blue);
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+  }
+
+  /* RESULT TEXT */
+  .result-text {
+    white-space: pre-wrap;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #1a1a2e;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* TAG BUTTONS */
+  .tag-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .tag-btn {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #d0d8ec;
+    background: #fff;
+    color: #555;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tag-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  /* FILTER BUTTONS */
+  .filter-row { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+  .filter-row input {
+    flex: 1;
+    min-width: 200px;
+    padding: 9px 14px;
+    border-radius: 8px;
+    border: 1.5px solid #d0d8ec;
+    font-size: 13px;
+    font-family: 'Montserrat', sans-serif;
+    outline: none;
+  }
+  .filter-btn {
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1.5px solid #d0d8ec;
+    background: #fff;
+    color: #555;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .filter-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  /* DOSSIER CARDS */
+  .dossier-list { display: grid; gap: 10px; }
+  .dossier-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px 20px;
+    border: 1px solid #dde4f0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .dossier-id { font-size: 11px; font-weight: 700; color: var(--blue); }
+  .dossier-date { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .dossier-name { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+  .dossier-type { font-size: 12px; color: #777; margin-top: 2px; }
+  .status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .dossier-notaris { font-size: 12px; color: #888; text-align: right; }
+  .stats-bar {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: var(--blue-bg);
+    border-radius: 8px;
+    display: flex;
+    gap: 24px;
+    font-size: 12px;
+    color: #555;
+  }
+
+  /* LOADING */
+  .loading-panel {
+    background: var(--blue-bg);
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+    color: var(--blue);
+    font-size: 13px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1.2;
+    font-weight: 600;
+  }
+  .spinner { display: inline-block; font-size: 32px; animation: spin 1s linear infinite; margin-bottom: 12px; }
+
+  /* FOOTER */
+  #footer {
+    padding: 12px 32px;
+    background: #fff;
+    border-top: 1px solid #e0e6f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: #aaa;
+  }
+
+  /* MODULE HIDE/SHOW */
+  .module { display: none; }
+  .module.active { display: block; }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 2px dashed #b0c0dd;
+    border-radius: 10px;
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--blue-bg);
+    position: relative;
+    margin-bottom: 14px;
+  }
+  .upload-zone:hover, .upload-zone.dragover { border-color: var(--blue); background: #dce7f5; }
+  .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+  .upload-zone .uz-icon { font-size: 26px; margin-bottom: 6px; }
+  .upload-zone .uz-text { font-size: 12px; font-weight: 600; color: var(--blue); }
+  .upload-zone .uz-sub  { font-size: 11px; color: #8899bb; margin-top: 3px; }
+  .file-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: #fff; border: 1.5px solid var(--blue);
+    border-radius: 20px; padding: 5px 12px;
+    font-size: 12px; font-weight: 600; color: var(--blue);
+    margin-bottom: 10px;
+  }
+  .file-badge .remove-file { cursor: pointer; color: #c0392b; font-size: 14px; line-height: 1; }
+  .input-mode-toggle { display: flex; gap: 0; margin-bottom: 14px; border-radius: 8px; overflow: hidden; border: 1.5px solid #d0d8ec; }
+  .mode-btn { flex: 1; padding: 8px; background: #fff; border: none; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600; color: #888; cursor: pointer; transition: all 0.15s; }
+  .mode-btn.active { background: var(--blue); color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div id="header-brand">
+    <div>
+      <span class="title">NotariAI</span>
+      <span class="subtitle">Backoffice Suite</span>
+    </div>
+    <div class="office">Koch &amp; Compaijen Notarissen · Utrecht</div>
+  </div>
+  <div id="tabs">
+    <button class="tab-btn active" onclick="switchTab('wwft', this)">
+      <span class="tab-icon">🛡️</span>
+      <span>Wwft / UBO</span>
+      <span class="tab-sub">Cliëntscreening</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('akte', this)">
+      <span class="tab-icon">📄</span>
+      <span>Akte Samenvatter</span>
+      <span class="tab-sub">Cliëntuitleg AI</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('intake', this)">
+      <span class="tab-icon">📋</span>
+      <span>IntakeFlow</span>
+      <span class="tab-sub">Vastgoed &amp; Familie</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('dossier', this)">
+      <span class="tab-icon">📁</span>
+      <span>Dossier Status</span>
+      <span class="tab-sub">Overzicht &amp; Voortgang</span>
+    </button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div id="content">
+
+  <!-- PAGE TITLE -->
+  <div id="page-title" class="page-title">🛡️ Wwft / UBO</div>
+  <div id="page-desc" class="page-desc">Voer cliëntgegevens in voor automatische Wwft-screening en UBO-analyse door AI.</div>
+
+  <!-- MODULE: WWFT -->
+  <div id="mod-wwft" class="module active">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-label">Cliëntgegevens invoeren</div>
+        <div class="field"><label>Volledige naam cliënt</label><input id="w-naam" placeholder="Bijv. J.H. van der Berg"></div>
+        <div class="field"><label>Geboortedatum</label><input id="w-dob" placeholder="DD-MM-JJJJ"></div>
+        <div class="field"><label>Nationaliteit</label><input id="w-nat" placeholder="Bijv. Nederlands"></div>
+        <div class="field"><label>Bron van middelen</label><input id="w-bron" placeholder="Bijv. verkoop woning, erfenis, salaris"></div>
+        <div class="field"><label>UBO-structuur</label><input id="w-ubo" placeholder="Bijv. directe aandeelhouder >25%"></div>
+        <div class="field"><label>Doel van de transactie</label><input id="w-doel" placeholder="Bijv. aankoop woning"></div>
+        <button class="btn-primary" id="w-btn" onclick="runWwft()">▶ Start Wwft Screening</button>
+      </div>
+      <div id="w-result-area">
+        <div class="panel-empty">
+          <div class="big-icon">🛡️</div>
+          <div class="empty-title">Vul de cliëntgegevens in en start de screening.</div>
+          <div class="empty-sub">De AI analyseert risicofactoren op basis van de KNB-richtlijnen.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE: AKTE -->
+  <div id="mod-akte" class="module">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-label">Akte invoeren</div>
+        <div class="field"><label>Naam cliënt</label><input id="a-naam" placeholder="Bijv. Fam. Van der Berg"></div>
+        <div class="field">
+          <label>Type akte</label>
+          <select id="a-type">
+            <option value="koopakte">Koopakte vastgoed</option>
+            <option value="testament">Testament</option>
+            <option value="huwelijkse voorwaarden">Huwelijkse voorwaarden</option>
+            <option value="samenlevingscontract">Samenlevingscontract</option>
+            <option value="volmacht">Volmacht</option>
+            <option value="statuten">Statuten / oprichting BV</option>
+          </select>
+        </div>
+
+        <!-- INPUT MODE TOGGLE -->
+        <div class="input-mode-toggle">
+          <button class="mode-btn active" id="mode-upload" onclick="setAkteMode('upload')">📎 Bestand uploaden</button>
+          <button class="mode-btn" id="mode-paste" onclick="setAkteMode('paste')">✏️ Tekst plakken</button>
+        </div>
+
+        <!-- UPLOAD MODE -->
+        <div id="akte-upload-area">
+          <div id="akte-file-badge" style="display:none"></div>
+          <div class="upload-zone" id="upload-zone"
+               ondragover="event.preventDefault();this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="handleDrop(event)">
+            <input type="file" accept=".pdf,.docx,.doc" onchange="handleFileSelect(event)" id="a-file-input">
+            <div class="uz-icon">📂</div>
+            <div class="uz-text">Klik of sleep een bestand hierheen</div>
+            <div class="uz-sub">Ondersteunde formaten: PDF · Word (.docx)</div>
+          </div>
+          <div id="akte-extract-status" style="font-size:12px;color:#888;min-height:18px;margin-bottom:6px;"></div>
+        </div>
+
+        <!-- PASTE MODE -->
+        <div id="akte-paste-area" style="display:none">
+          <div class="field"><label>Akte-tekst (plakken)</label><textarea id="a-tekst" rows="10" placeholder="Plak hier de juridische akte-tekst..."></textarea></div>
+        </div>
+
+        <button class="btn-primary" id="a-btn" onclick="runAkte()">📄 Genereer Cliëntuitleg</button>
+      </div>
+      <div id="a-result-area">
+        <div class="panel-empty">
+          <div class="big-icon">📋</div>
+          <div class="empty-title">Upload een akte of plak de tekst en genereer een begrijpelijke uitleg.</div>
+          <div class="empty-sub">Ondersteunt PDF en Word-bestanden.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE: INTAKE -->
+  <div id="mod-intake" class="module">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-label">Nieuwe Cliëntintake</div>
+        <div class="field">
+          <label>Rechtsgebied</label>
+          <div class="tag-group" id="rechtsgebied-group">
+            <button class="tag-btn active" onclick="setRechtsgebied('vastgoed', this)">🏠 Vastgoed</button>
+            <button class="tag-btn" onclick="setRechtsgebied('erfrecht', this)">📜 Erfrecht</button>
+            <button class="tag-btn" onclick="setRechtsgebied('familierecht', this)">👨‍👩‍👧 Familierecht</button>
+            <button class="tag-btn" onclick="setRechtsgebied('ondernemingsrecht', this)">🏢 Ondernemingsrecht</button>
+          </div>
+        </div>
+        <div class="field"><label>Naam cliënt</label><input id="i-naam" placeholder="Volledige naam"></div>
+        <div class="field"><label>Telefoonnummer</label><input id="i-tel" placeholder="+31 6 ..."></div>
+        <div class="field"><label>E-mailadres</label><input id="i-email" placeholder="naam@email.nl"></div>
+        <div class="field"><label>Beschrijf de situatie</label><textarea id="i-situatie" rows="5" placeholder="Bijv: Wij willen onze woning verkopen en een andere kopen. Er is ook een hypotheek..."></textarea></div>
+        <div class="field"><label>Specifieke vraag of wens</label><input id="i-vraag" placeholder="Bijv: Snel regelen voor 1 april"></div>
+        <button class="btn-primary" id="i-btn" onclick="runIntake()">📂 Genereer Intake Dossier</button>
+      </div>
+      <div id="i-result-area">
+        <div class="panel-empty">
+          <div class="big-icon">📁</div>
+          <div class="empty-title">Vul de intake in en genereer automatisch een volledig dossier.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE: DOSSIER -->
+  <div id="mod-dossier" class="module">
+    <div class="filter-row">
+      <input id="d-search" placeholder="🔍  Zoek op naam of dossiernummer..." oninput="renderDossiers()">
+      <button class="filter-btn active" id="f-alle" onclick="setFilter('alle', this)">Alle dossiers</button>
+      <button class="filter-btn" id="f-hoog" onclick="setFilter('hoog', this)">🔴 Urgent</button>
+      <button class="filter-btn" id="f-midden" onclick="setFilter('midden', this)">🟡 Midden</button>
+      <button class="filter-btn" id="f-laag" onclick="setFilter('laag', this)">🟢 Normaal</button>
+    </div>
+    <div id="dossier-list" class="dossier-list"></div>
+    <div id="dossier-stats" class="stats-bar"></div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div id="footer">
+  <span>NotariAI · Alle data verwerkt conform AVG en KNB-beroepsnormen</span>
+  <span>Powered by AI · Rick Hermanns Consulting</span>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let activeRechtsgebied = 'vastgoed';
+let activeFilter = 'alle';
+
+const TABS_META = {
+  wwft:    { title: '🛡️ Wwft / UBO',        desc: 'Voer cliëntgegevens in voor automatische Wwft-screening en UBO-analyse door AI.' },
+  akte:    { title: '📄 Akte Samenvatter',   desc: 'Plak een concept-akte en genereer direct een begrijpelijke uitleg voor de cliënt.' },
+  intake:  { title: '📋 IntakeFlow',         desc: 'Leg een nieuwe cliëntintake vast en laat AI een volledig intake-dossier samenstellen.' },
+  dossier: { title: '📁 Dossier Status',     desc: 'Real-time overzicht van actieve dossiers, prioriteiten en voortgang.' },
+};
+
+const DOSSIERS = [
+  { id: 'D-2025-0441', naam: 'Familie Van der Berg',  type: 'Erfrecht',            status: 'In behandeling',           datum: '2025-03-01', notaris: 'Mr. Koch',        urgentie: 'hoog' },
+  { id: 'D-2025-0440', naam: 'Smit & Janssen BV',     type: 'Vastgoed',            status: 'Wacht op documenten',      datum: '2025-02-28', notaris: 'Mr. Compaijen',   urgentie: 'midden' },
+  { id: 'D-2025-0438', naam: 'P. Hendriksen',          type: 'Vastgoed',            status: 'Concept akte gereed',      datum: '2025-02-25', notaris: 'Kand. De Vries',  urgentie: 'laag' },
+  { id: 'D-2025-0435', naam: 'Stichting Zonnehuis',   type: 'Statutenwijziging',   status: 'Getekend',                 datum: '2025-02-20', notaris: 'Mr. Koch',        urgentie: 'laag' },
+  { id: 'D-2025-0432', naam: 'Familie Oosterom',       type: 'Erfrecht',            status: 'Wwft screening vereist',   datum: '2025-02-18', notaris: 'Mr. Compaijen',   urgentie: 'hoog' },
+];
+
+const STATUS_COLORS = {
+  'In behandeling':         '#204C8D',
+  'Wacht op documenten':    '#c8a84b',
+  'Concept akte gereed':    '#2e7d32',
+  'Getekend':               '#555',
+  'Wwft screening vereist': '#c0392b',
+};
+
+// ── TAB SWITCHING ──────────────────────────────────────────────────────────────
+function switchTab(id, el) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+  document.getElementById('mod-' + id).classList.add('active');
+  document.getElementById('page-title').textContent = TABS_META[id].title;
+  document.getElementById('page-desc').textContent  = TABS_META[id].desc;
+  if (id === 'dossier') renderDossiers();
+}
+
+// ── CLAUDE API ─────────────────────────────────────────────────────────────────
+async function callClaude(systemPrompt, userMessage) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
+    }),
+  });
+  const data = await res.json();
+  return data.content?.[0]?.text || 'Geen resultaat ontvangen.';
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────────
+function setLoading(areaId, btnId, btnText) {
+  document.getElementById(areaId).innerHTML = `
+    <div class="loading-panel">
+      <div class="spinner">⚙️</div>
+      <div>${btnText}</div>
+    </div>`;
+  const btn = document.getElementById(btnId);
+  btn.disabled = true;
+  btn.textContent = 'Bezig...';
+}
+
+function resetBtn(btnId, label) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = false;
+  btn.textContent = label;
+}
+
+function showResult(areaId, label, text, showCopy = true) {
+  const copyBtn = showCopy
+    ? `<button class="btn-secondary" onclick="copyText(\`${text.replace(/`/g,'\\`')}\`)">📋 Kopieer tekst</button>`
+    : '';
+  document.getElementById(areaId).innerHTML = `
+    <div class="panel-result">
+      <div class="result-label">${label}</div>
+      <div class="result-text">${escHtml(text)}</div>
+      ${copyBtn}
+    </div>`;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyText(text) {
+  navigator.clipboard?.writeText(text).then(() => alert('Tekst gekopieerd!'));
+}
+
+// ── WWFT MODULE ────────────────────────────────────────────────────────────────
+async function runWwft() {
+  const naam  = document.getElementById('w-naam').value;
+  const dob   = document.getElementById('w-dob').value;
+  const nat   = document.getElementById('w-nat').value;
+  const bron  = document.getElementById('w-bron').value;
+  const ubo   = document.getElementById('w-ubo').value;
+  const doel  = document.getElementById('w-doel').value;
+  if (!naam) return;
+
+  setLoading('w-result-area', 'w-btn', 'Screening in uitvoering...');
+
+  const sys = `Je bent een Wwft-compliance specialist voor een Nederlands notariskantoor. Analyseer de cliëntinformatie en genereer:
+1. RISICOKLASSE: Laag / Midden / Hoog (met korte motivatie)
+2. RISICOFACTOREN: Maximaal 4 concrete aandachtspunten
+3. AANBEVOLEN ACTIES: Welke documenten of verificaties zijn nog nodig?
+4. UBO-BEOORDELING: Is de UBO-structuur acceptabel of zijn er vragen?
+Schrijf professioneel, beknopt en in het Nederlands.`;
+
+  const msg = `Cliënt: ${naam}, geboren ${dob}, nationaliteit: ${nat}. Bron van middelen: ${bron}. UBO-structuur: ${ubo}. Doel van de transactie: ${doel}.`;
+
+  const text = await callClaude(sys, msg);
+  showResult('w-result-area', 'Screeningsresultaat', text);
+  resetBtn('w-btn', '▶ Start Wwft Screening');
+}
+
+// ── AKTE FILE UPLOAD ───────────────────────────────────────────────────────────
+let akteMode = 'upload';
+let extractedAkteText = '';
+
+// Set PDF.js worker
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+function setAkteMode(mode) {
+  akteMode = mode;
+  document.getElementById('mode-upload').classList.toggle('active', mode === 'upload');
+  document.getElementById('mode-paste').classList.toggle('active', mode === 'paste');
+  document.getElementById('akte-upload-area').style.display = mode === 'upload' ? 'block' : 'none';
+  document.getElementById('akte-paste-area').style.display  = mode === 'paste'  ? 'block' : 'none';
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+}
+
+async function processFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const status = document.getElementById('akte-extract-status');
+  const badge  = document.getElementById('akte-file-badge');
+
+  status.textContent = '⏳ Bestand wordt verwerkt...';
+  extractedAkteText = '';
+
+  try {
+    if (ext === 'pdf') {
+      extractedAkteText = await extractPdf(file);
+    } else if (ext === 'docx' || ext === 'doc') {
+      extractedAkteText = await extractDocx(file);
+    } else {
+      status.textContent = '❌ Ongeldig bestandstype. Gebruik PDF of Word (.docx).';
+      return;
+    }
+
+    const words = extractedAkteText.trim().split(/\s+/).length;
+    status.textContent = `✅ ${words.toLocaleString('nl')} woorden geladen uit "${file.name}"`;
+    badge.style.display = 'inline-flex';
+    badge.innerHTML = `<span>📄 ${file.name}</span><span class="remove-file" onclick="clearFile()">✕</span>`;
+    document.getElementById('upload-zone').style.display = 'none';
+  } catch (err) {
+    status.textContent = '❌ Fout bij verwerken: ' + err.message;
+    console.error(err);
+  }
+}
+
+function clearFile() {
+  extractedAkteText = '';
+  document.getElementById('akte-file-badge').style.display = 'none';
+  document.getElementById('upload-zone').style.display = 'block';
+  document.getElementById('akte-extract-status').textContent = '';
+  document.getElementById('a-file-input').value = '';
+}
+
+async function extractPdf(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    fullText += content.items.map(item => item.str).join(' ') + '\n';
+  }
+  return fullText.trim();
+}
+
+async function extractDocx(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer });
+  return result.value.trim();
+}
+
+// ── AKTE MODULE ────────────────────────────────────────────────────────────────
+async function runAkte() {
+  const naam  = document.getElementById('a-naam').value;
+  const type  = document.getElementById('a-type').value;
+
+  let tekst = '';
+  if (akteMode === 'upload') {
+    tekst = extractedAkteText;
+    if (!tekst) { alert('Upload eerst een PDF of Word-bestand.'); return; }
+  } else {
+    tekst = document.getElementById('a-tekst').value;
+    if (!tekst) return;
+  }
+
+  setLoading('a-result-area', 'a-btn', 'Tekst wordt vertaald naar begrijpelijke taal...');
+
+  const sys = `Je bent een notarieel medewerker bij een notariskantoor. Je taak is om een juridische akte te vertalen naar een begrijpelijke, warme uitleg voor de cliënt. De samenvatting moet:
+- Beginnen met een persoonlijke aanhef (gebruik de naam als opgegeven)
+- In maximaal 5 korte alinea's de kern uitleggen
+- Juridisch jargon vervangen door begrijpelijke taal
+- Eindigen met: "Heeft u vragen over deze akte? Neem gerust contact op."
+- Toon: vriendelijk, professioneel, geruststellend
+- Taal: Nederlands`;
+
+  const msg = `Naam cliënt: ${naam || 'Cliënt'}. Type akte: ${type}.\n\nAkte-tekst:\n${tekst.substring(0, 8000)}`;
+  const text = await callClaude(sys, msg);
+  showResult('a-result-area', 'Cliëntuitleg — Klaar voor verzending', text);
+  resetBtn('a-btn', '📄 Genereer Cliëntuitleg');
+}
+
+// ── INTAKE MODULE ──────────────────────────────────────────────────────────────
+function setRechtsgebied(val, el) {
+  activeRechtsgebied = val;
+  document.querySelectorAll('#rechtsgebied-group .tag-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function runIntake() {
+  const naam     = document.getElementById('i-naam').value;
+  const tel      = document.getElementById('i-tel').value;
+  const email    = document.getElementById('i-email').value;
+  const situatie = document.getElementById('i-situatie').value;
+  const vraag    = document.getElementById('i-vraag').value;
+  if (!naam || !situatie) return;
+
+  setLoading('i-result-area', 'i-btn', 'Intake dossier wordt samengesteld...');
+
+  const sys = `Je bent een intake-specialist bij een notariskantoor. Op basis van de beschreven situatie van de cliënt genereer je een gestructureerd intake-dossier. Gebruik dit formaat:
+
+INTAKE DOSSIER — [NAAM CLIËNT]
+Rechtsgebied: [gebied]
+Datum intake: [vandaag]
+Prioriteit: [Normaal / Urgent / Spoed]
+
+SITUATIEANALYSE
+[Korte samenvatting van de klantsituatie in 2-3 zinnen]
+
+BENODIGDE DOCUMENTEN
+[Lijst van minimaal 5 specifieke documenten]
+
+AANBEVOLEN SPECIALISME
+[Welke kandidaat-notaris of notaris is het meest geschikt en waarom?]
+
+VERVOLGSTAPPEN
+[Genummerde lijst van 4-5 concrete acties voor het kantoor]
+
+AANDACHTSPUNTEN
+[Eventuele bijzonderheden, risico's of vragen voor de notaris]
+
+Schrijf professioneel, praktisch en in het Nederlands.`;
+
+  const msg = `Rechtsgebied: ${activeRechtsgebied}. Cliënt: ${naam}, tel: ${tel}, email: ${email}. Situatie: ${situatie}. Specifieke vraag: ${vraag}`;
+  const text = await callClaude(sys, msg);
+  showResult('i-result-area', 'Gegenereerd Intake Dossier', text);
+  resetBtn('i-btn', '📂 Genereer Intake Dossier');
+}
+
+// ── DOSSIER MODULE ─────────────────────────────────────────────────────────────
+function setFilter(val, el) {
+  activeFilter = val;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderDossiers();
+}
+
+function renderDossiers() {
+  const search = (document.getElementById('d-search')?.value || '').toLowerCase();
+  const filtered = DOSSIERS.filter(d => {
+    if (activeFilter !== 'alle' && d.urgentie !== activeFilter) return false;
+    if (search && !d.naam.toLowerCase().includes(search) && !d.id.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const urgColors = { hoog: '#c0392b', midden: '#c8a84b', laag: '#a8c0a0' };
+  const list = document.getElementById('dossier-list');
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px;font-size:13px;">Geen dossiers gevonden</div>';
+  } else {
+    list.innerHTML = filtered.map(d => `
+      <div class="dossier-card" style="border-left: 4px solid ${urgColors[d.urgentie]}">
+        <div style="flex:0 0 110px">
+          <div class="dossier-id">${d.id}</div>
+          <div class="dossier-date">${d.datum}</div>
+        </div>
+        <div style="flex:1">
+          <div class="dossier-name">${d.naam}</div>
+          <div class="dossier-type">${d.type}</div>
+        </div>
+        <div style="flex:0 0 auto">
+          <span class="status-badge" style="background:${STATUS_COLORS[d.status]}18;color:${STATUS_COLORS[d.status]};border:1px solid ${STATUS_COLORS[d.status]}40">${d.status}</span>
+        </div>
+        <div class="dossier-notaris" style="flex:0 0 120px">${d.notaris}</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('dossier-stats').innerHTML = `
+    <span><strong style="color:var(--blue)">${DOSSIERS.length}</strong> dossiers totaal</span>
+    <span><strong style="color:#c0392b">${DOSSIERS.filter(d=>d.urgentie==='hoog').length}</strong> urgent</span>
+    <span><strong style="color:#c8a84b">${DOSSIERS.filter(d=>d.urgentie==='midden').length}</strong> middelhoog</span>
+    <span><strong style="color:#2e7d32">${DOSSIERS.filter(d=>d.urgentie==='laag').length}</strong> normaal</span>`;
+}
+
+// Init dossier on load
+renderDossiers();
+</script>
+</body>
+</html>
