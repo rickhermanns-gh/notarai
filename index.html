@@ -873,17 +873,35 @@ function switchTab(id, el) {
   document.getElementById('app-page-desc').textContent  = TABS_META[id]?.desc  || '';
 }
 
-// ── CLAUDE API ────────────────────────────────────────────────────────────────
+// ── CLAUDE API VIA CLOUDFLARE WORKER ─────────────────────────────────────────
+// Vervang de URL hieronder met jouw eigen Worker-URL na deployment
+const WORKER_URL = 'https://notariai.rickhermanns.workers.dev';
+
 async function callClaude(sys, msg) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:sys, messages:[{role:'user',content:msg}] })
-  });
-  const d = await res.json();
-  return d.content?.[0]?.text || 'Geen resultaat ontvangen.';
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1500,
+        system: sys,
+        messages: [{ role: 'user', content: msg }]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return `⚠️ Fout ${res.status}: ${err?.error?.message || 'Controleer de Worker-configuratie.'}`;
+    }
+    const d = await res.json();
+    return d.content?.[0]?.text || 'Geen resultaat ontvangen.';
+  } catch (e) {
+    return `⚠️ Verbindingsfout: ${e.message}`;
+  }
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
+
 function setLoading(areaId, btnId, msg) {
   document.getElementById(areaId).innerHTML = `<div class="loading-panel"><div class="spinner">⚙️</div><div>${msg}</div></div>`;
   const btn = document.getElementById(btnId);
