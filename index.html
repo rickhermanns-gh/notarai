@@ -34,7 +34,7 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
    VIEW SWITCHER
 ═══════════════════════════════════════════════════════ */
 #view-landing { display: block; }
-#view-app     { display: none;  }
+#view-app     { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; z-index: 1000; }
 
 /* ═══════════════════════════════════════════════════════
    ██ LANDING PAGE STYLES
@@ -249,7 +249,6 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
   min-height: 100vh;
   flex-direction: column;
 }
-#view-app.active { display: flex; }
 
 /* APP HEADER */
 #app-header { background:var(--blue);padding:0 32px;display:flex;align-items:center;gap:0; }
@@ -887,31 +886,18 @@ const TABS_META = {
 };
 
 function openApp(tab) {
-  // Scroll to top FIRST before switching views
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
   document.getElementById('view-landing').style.display = 'none';
-  document.getElementById('view-app').style.display = 'flex';
-  // Force scroll again after display change
-  requestAnimationFrame(() => {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  });
+  const appEl = document.getElementById('view-app');
+  appEl.classList.add('active');
+  appEl.scrollTop = 0;  // scroll the app div itself to top
   switchTab(tab, document.querySelector(`.tab-btn[onclick*="'${tab}'"]`));
   renderDossiers();
 }
 
 function closeApp() {
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
+  document.getElementById('view-app').classList.remove('active');
   document.getElementById('view-app').style.display = 'none';
   document.getElementById('view-landing').style.display = 'block';
-  requestAnimationFrame(() => {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  });
 }
 
 function lpScrollTo(id) {
