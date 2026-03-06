@@ -227,14 +227,18 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
 /* REVEAL ANIMATION */
 @keyframes lp-fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
 @keyframes lp-fadeIn { from{opacity:0} to{opacity:1} }
-.lp-reveal { opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease; }
-.lp-reveal.visible { opacity:1;transform:translateY(0); }
+.lp-reveal { transition:opacity 0.6s ease,transform 0.6s ease; }
+/* Only hide elements when JS is active (js-ready class added by script) */
+.js-ready .lp-reveal { opacity:0;transform:translateY(24px); }
+.js-ready .lp-reveal.visible { opacity:1;transform:translateY(0); }
 .lp-reveal-d1 { transition-delay:0.08s; }
 .lp-reveal-d2 { transition-delay:0.16s; }
 .lp-reveal-d3 { transition-delay:0.24s; }
 .lp-reveal-d4 { transition-delay:0.32s; }
-/* Fallback: if JS doesn't run, still show content */
-.no-js .lp-reveal { opacity:1;transform:none; }
+/* Steps default hidden only under js-ready */
+.lp-step { transition:opacity 0.6s ease,transform 0.6s ease; }
+.js-ready .lp-step { opacity:0;transform:translateY(20px); }
+.js-ready .lp-step.visible { opacity:1;transform:translateY(0); }
 
 /* ═══════════════════════════════════════════════════════
    ██ APP STYLES
@@ -417,6 +421,7 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
       <p class="lp-section-sub">Van het eerste cliëntcontact tot de getekende akte — NotariAI ondersteunt uw team op de momenten waarop het er toe doet.</p>
     </div>
     <div class="lp-modules-grid">
+      <!-- Module 01: Wwft -->
       <div class="lp-module-card lp-reveal lp-reveal-d1">
         <div class="lp-module-icon">🛡️</div>
         <div class="lp-module-num">Module 01</div>
@@ -429,47 +434,12 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
         </div>
         <button class="lp-module-btn" onclick="openApp('wwft')">Probeer deze module →</button>
       </div>
-      <div class="lp-module-card lp-reveal lp-reveal-d2">
-        <div class="lp-module-icon">📄</div>
-        <div class="lp-module-num">Module 02</div>
-        <h3 class="lp-module-title">Heldere Akte-Samenvatter</h3>
-        <p class="lp-module-desc">Upload een PDF of Word-akte en ontvang direct een begrijpelijke cliëntuitleg. Juridisch vakjargon wordt vertaald zonder de juridische kern te verliezen.</p>
-        <div class="lp-module-features">
-          <div class="lp-module-feature">Directe upload van PDF én Word (.docx)</div>
-          <div class="lp-module-feature">Persoonlijke aanhef op naam cliënt</div>
-          <div class="lp-module-feature">Kopieer direct naar dossier of e-mail</div>
-        </div>
-        <button class="lp-module-btn" onclick="openApp('akte')">Probeer deze module →</button>
-      </div>
-      <div class="lp-module-card lp-reveal lp-reveal-d1">
-        <div class="lp-module-icon">📋</div>
-        <div class="lp-module-num">Module 03</div>
-        <h3 class="lp-module-title">IntakeFlow</h3>
-        <p class="lp-module-desc">Slimme cliëntintake voor vastgoed, erfrecht, familierecht en ondernemingsrecht. De AI stelt automatisch een volledig intake-dossier samen.</p>
-        <div class="lp-module-features">
-          <div class="lp-module-feature">Dossierklaar in minder dan 2 minuten</div>
-          <div class="lp-module-feature">Automatische prioriteitsstelling</div>
-          <div class="lp-module-feature">Aanbeveling van juiste specialisme</div>
-        </div>
-        <button class="lp-module-btn" onclick="openApp('intake')">Probeer deze module →</button>
-      </div>
-      <div class="lp-module-card lp-reveal lp-reveal-d2">
-        <div class="lp-module-icon">📁</div>
-        <div class="lp-module-num">Module 04</div>
-        <h3 class="lp-module-title">Dossier Statusoverzicht</h3>
-        <p class="lp-module-desc">Real-time inzicht in alle actieve dossiers. Filter op urgentie, notaris of status en zie in één oogopslag waar actie vereist is.</p>
-        <div class="lp-module-features">
-          <div class="lp-module-feature">Urgentiefilter: Normaal / Midden / Urgent</div>
-          <div class="lp-module-feature">Overzicht per notaris en kandidaat-notaris</div>
-          <div class="lp-module-feature">Directe statusupdates per dossier</div>
-        </div>
-        <button class="lp-module-btn" onclick="openApp('dossier')">Probeer deze module →</button>
-      </div>
-      <div class="lp-module-card full-width lp-reveal lp-reveal-d1">
+      <!-- Module 02: Belehrung — full width -->
+      <div class="lp-module-card full-width lp-reveal lp-reveal-d2">
         <div style="display:flex;align-items:flex-start;gap:32px;flex-wrap:wrap">
           <div style="flex:0 0 auto">
             <div class="lp-module-icon" style="background:rgba(200,168,75,0.15);border-color:rgba(200,168,75,0.4)">🎯</div>
-            <div class="lp-module-num">Module 05</div>
+            <div class="lp-module-num">Module 02</div>
             <div style="display:inline-block;margin-top:8px;font-size:9px;font-weight:700;color:var(--gold);background:rgba(200,168,75,0.12);border:1px solid rgba(200,168,75,0.3);border-radius:4px;padding:3px 8px;text-transform:uppercase;letter-spacing:1.5px">Pilot · Nieuw</div>
           </div>
           <div style="flex:1;min-width:260px">
@@ -489,7 +459,46 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
           </div>
         </div>
       </div>
-    </div>
+      <!-- Module 03: Akte -->
+      <div class="lp-module-card lp-reveal lp-reveal-d1">
+        <div class="lp-module-icon">📄</div>
+        <div class="lp-module-num">Module 03</div>
+        <h3 class="lp-module-title">Heldere Akte-Samenvatter</h3>
+        <p class="lp-module-desc">Upload een PDF of Word-akte en ontvang direct een begrijpelijke cliëntuitleg. Juridisch vakjargon wordt vertaald zonder de juridische kern te verliezen.</p>
+        <div class="lp-module-features">
+          <div class="lp-module-feature">Directe upload van PDF én Word (.docx)</div>
+          <div class="lp-module-feature">Persoonlijke aanhef op naam cliënt</div>
+          <div class="lp-module-feature">Kopieer direct naar dossier of e-mail</div>
+        </div>
+        <button class="lp-module-btn" onclick="openApp('akte')">Probeer deze module →</button>
+      </div>
+      <!-- Module 04: Intake -->
+      <div class="lp-module-card lp-reveal lp-reveal-d2">
+        <div class="lp-module-icon">📋</div>
+        <div class="lp-module-num">Module 04</div>
+        <h3 class="lp-module-title">IntakeFlow</h3>
+        <p class="lp-module-desc">Slimme cliëntintake voor vastgoed, erfrecht, familierecht en ondernemingsrecht. De AI stelt automatisch een volledig intake-dossier samen.</p>
+        <div class="lp-module-features">
+          <div class="lp-module-feature">Dossierklaar in minder dan 2 minuten</div>
+          <div class="lp-module-feature">Automatische prioriteitsstelling</div>
+          <div class="lp-module-feature">Aanbeveling van juiste specialisme</div>
+        </div>
+        <button class="lp-module-btn" onclick="openApp('intake')">Probeer deze module →</button>
+      </div>
+      <!-- Module 05: Dossier -->
+      <div class="lp-module-card lp-reveal lp-reveal-d1">
+        <div class="lp-module-icon">📁</div>
+        <div class="lp-module-num">Module 05</div>
+        <h3 class="lp-module-title">Dossier Statusoverzicht</h3>
+        <p class="lp-module-desc">Real-time inzicht in alle actieve dossiers. Filter op urgentie, notaris of status en zie in één oogopslag waar actie vereist is.</p>
+        <div class="lp-module-features">
+          <div class="lp-module-feature">Urgentiefilter: Normaal / Midden / Urgent</div>
+          <div class="lp-module-feature">Overzicht per notaris en kandidaat-notaris</div>
+          <div class="lp-module-feature">Directe statusupdates per dossier</div>
+        </div>
+        <button class="lp-module-btn" onclick="openApp('dossier')">Probeer deze module →</button>
+      </div>
+    </div></div>
   </div>
 </section>
 
@@ -631,10 +640,10 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
   </div>
   <div id="app-tabs">
     <button class="tab-btn active" onclick="switchTab('wwft',this)"><span class="tab-icon">🛡️</span><span>Wwft / UBO</span><span class="tab-sub">Cliëntscreening</span></button>
+    <button class="tab-btn" onclick="switchTab('belehrung',this)"><span class="tab-icon">🎯</span><span>Belehrung Prep</span><span class="tab-sub">Familiedynamiek AI</span></button>
     <button class="tab-btn" onclick="switchTab('akte',this)"><span class="tab-icon">📄</span><span>Akte Samenvatter</span><span class="tab-sub">Cliëntuitleg AI</span></button>
     <button class="tab-btn" onclick="switchTab('intake',this)"><span class="tab-icon">📋</span><span>IntakeFlow</span><span class="tab-sub">Vastgoed &amp; Familie</span></button>
     <button class="tab-btn" onclick="switchTab('dossier',this)"><span class="tab-icon">📁</span><span>Dossier Status</span><span class="tab-sub">Overzicht &amp; Voortgang</span></button>
-    <button class="tab-btn" onclick="switchTab('belehrung',this)"><span class="tab-icon">🎯</span><span>Belehrung Prep</span><span class="tab-sub">Familiedynamiek AI</span></button>
   </div>
 </div>
 
@@ -1121,7 +1130,9 @@ Focusgebied: ${belehrungFocus}`;
 }
 
 // ── LANDING PAGE ANIMATIONS ───────────────────────────────────────────────────
-// Reveal animation — threshold 0 = fires as soon as 1px enters viewport
+// Add js-ready so CSS hides elements — only if JS actually runs
+document.getElementById('view-landing').classList.add('js-ready');
+
 const lpObserver = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
@@ -1131,17 +1142,17 @@ const lpObserver = new IntersectionObserver(entries => {
       } else {
         e.target.classList.add('visible');
       }
-      lpObserver.unobserve(e.target); // stop watching once visible
+      lpObserver.unobserve(e.target);
     }
   });
-}, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+}, { threshold: 0, rootMargin: '0px 0px -60px 0px' });
 
-document.querySelectorAll('.lp-reveal, .lp-step').forEach(el => lpObserver.observe(el));
+document.querySelectorAll('#view-landing .lp-reveal, #view-landing .lp-step').forEach(el => lpObserver.observe(el));
 
-// Hard fallback: make everything visible after 1.5s regardless
+// Nuclear fallback: reveal everything after 800ms no matter what
 setTimeout(() => {
-  document.querySelectorAll('.lp-reveal, .lp-step').forEach(el => el.classList.add('visible'));
-}, 1500);
+  document.querySelectorAll('#view-landing .lp-reveal, #view-landing .lp-step').forEach(el => el.classList.add('visible'));
+}, 800);
 
 window.addEventListener('scroll', () => {
   const nav = document.getElementById('lp-nav');
