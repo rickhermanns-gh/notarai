@@ -817,6 +817,16 @@ function renderDossiers() {
 
 // Init dossier on load
 renderDossiers();
+
+// ── DEEP LINK: open correct tab from URL hash ──────────────────────────────
+(function() {
+  const hash = window.location.hash.replace('#', '');
+  const validTabs = ['wwft', 'akte', 'intake', 'dossier'];
+  if (validTabs.includes(hash)) {
+    const tabBtn = document.querySelector(`.tab-btn[onclick*="'${hash}'"]`);
+    if (tabBtn) switchTab(hash, tabBtn);
+  }
+})();
 </script>
 </body>
 </html>
