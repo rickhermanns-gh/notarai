@@ -34,7 +34,8 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
    VIEW SWITCHER
 ═══════════════════════════════════════════════════════ */
 #view-landing { display: block; }
-#view-app     { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; z-index: 1000; }
+#view-app     { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; z-index: 1000; background: #f4f6fb; }
+#view-app.active { display: flex; }
 
 /* ═══════════════════════════════════════════════════════
    ██ LANDING PAGE STYLES
@@ -889,14 +890,16 @@ function openApp(tab) {
   document.getElementById('view-landing').style.display = 'none';
   const appEl = document.getElementById('view-app');
   appEl.classList.add('active');
-  appEl.scrollTop = 0;  // scroll the app div itself to top
+  appEl.style.display = 'flex';
+  appEl.scrollTop = 0;
   switchTab(tab, document.querySelector(`.tab-btn[onclick*="'${tab}'"]`));
   renderDossiers();
 }
 
 function closeApp() {
-  document.getElementById('view-app').classList.remove('active');
-  document.getElementById('view-app').style.display = 'none';
+  const appEl = document.getElementById('view-app');
+  appEl.classList.remove('active');
+  appEl.style.display = 'none';
   document.getElementById('view-landing').style.display = 'block';
 }
 
