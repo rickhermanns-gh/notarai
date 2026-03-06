@@ -134,7 +134,8 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
 
 /* MODULES GRID */
 .lp-modules-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin-top:60px;border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden; }
-.lp-module-card.full-width { grid-column: 1 / -1; background: linear-gradient(135deg, #172a4a, #1a3360); border-top: 2px solid rgba(200,168,75,0.3); }
+.lp-module-highlight { background: linear-gradient(160deg, #172a4a 0%, #1a3360 100%) !important; border-top: 2px solid rgba(200,168,75,0.25); }
+.lp-module-full { grid-column: 1 / -1; background: var(--navy2); border-top: 1px solid rgba(200,168,75,0.2); }
 .lp-module-card { background:var(--navy2);padding:44px 40px;transition:background 0.3s;cursor:default;position:relative;overflow:hidden; }
 .lp-module-card::after { content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);transform:scaleX(0);transform-origin:left;transition:transform 0.4s; }
 .lp-module-card:hover { background:#172a4a; }
@@ -421,7 +422,8 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
       <p class="lp-section-sub">Van het eerste cliëntcontact tot de getekende akte — NotariAI ondersteunt uw team op de momenten waarop het er toe doet.</p>
     </div>
     <div class="lp-modules-grid">
-      <!-- Module 01: Wwft -->
+
+      <!-- 01 + 02 row -->
       <div class="lp-module-card lp-reveal lp-reveal-d1">
         <div class="lp-module-icon">🛡️</div>
         <div class="lp-module-num">Module 01</div>
@@ -434,32 +436,23 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
         </div>
         <button class="lp-module-btn" onclick="openApp('wwft')">Probeer deze module →</button>
       </div>
-      <!-- Module 02: Belehrung — full width -->
-      <div class="lp-module-card full-width lp-reveal lp-reveal-d2">
-        <div style="display:flex;align-items:flex-start;gap:32px;flex-wrap:wrap">
-          <div style="flex:0 0 auto">
-            <div class="lp-module-icon" style="background:rgba(200,168,75,0.15);border-color:rgba(200,168,75,0.4)">🎯</div>
-            <div class="lp-module-num">Module 02</div>
-            <div style="display:inline-block;margin-top:8px;font-size:9px;font-weight:700;color:var(--gold);background:rgba(200,168,75,0.12);border:1px solid rgba(200,168,75,0.3);border-radius:4px;padding:3px 8px;text-transform:uppercase;letter-spacing:1.5px">Pilot · Nieuw</div>
-          </div>
-          <div style="flex:1;min-width:260px">
-            <h3 class="lp-module-title">Belehrung Voorbereider</h3>
-            <p class="lp-module-desc">AI analyseert familiedynamiek, vermogenssituatie en bekende spanningspunten om de notaris te voorzien van een gepersonaliseerd vraagscript en risicolijst vóór het persoonlijke belehrunggesprek. De gap die geen enkel systeem nu overbrugt: context-analyse over families en cliëntnetwerken.</p>
-            <div class="lp-module-features" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:14px">
-              <div class="lp-module-feature">Risicosignalen uit familiedynamiek</div>
-              <div class="lp-module-feature">Gepersonaliseerd vraagscript per gezin</div>
-              <div class="lp-module-feature">Patronen: ongelijke vermogens → erfbelasting</div>
-              <div class="lp-module-feature">Aandachtspunten legitieme portie &amp; zorg</div>
-              <div class="lp-module-feature">Juridische ankerpunten per zaaktype</div>
-              <div class="lp-module-feature">Focusgebied instelbaar per gesprek</div>
-            </div>
-          </div>
-          <div style="flex:0 0 auto;align-self:center">
-            <button class="lp-module-btn" style="white-space:nowrap" onclick="openApp('belehrung')">Probeer deze module →</button>
-          </div>
+
+      <div class="lp-module-card lp-module-highlight lp-reveal lp-reveal-d2">
+        <div class="lp-module-icon" style="background:rgba(200,168,75,0.15);border-color:rgba(200,168,75,0.4)">🎯</div>
+        <div class="lp-module-num">Module 02</div>
+        <div style="display:inline-block;margin-bottom:10px;font-size:9px;font-weight:700;color:var(--gold);background:rgba(200,168,75,0.12);border:1px solid rgba(200,168,75,0.3);border-radius:4px;padding:3px 8px;text-transform:uppercase;letter-spacing:1.5px">Pilot · Nieuw</div>
+        <h3 class="lp-module-title">Belehrung Voorbereider</h3>
+        <p class="lp-module-desc">AI analyseert familiedynamiek en vermogenssituatie voor een gepersonaliseerd vraagscript en risicolijst vóór het persoonlijke belehrunggesprek.</p>
+        <div class="lp-module-features">
+          <div class="lp-module-feature">Risicosignalen uit familiedynamiek</div>
+          <div class="lp-module-feature">Gepersonaliseerd vraagscript per gezin</div>
+          <div class="lp-module-feature">Patronen: ongelijke vermogens → erfbelasting</div>
+          <div class="lp-module-feature">Juridische ankerpunten per zaaktype</div>
         </div>
+        <button class="lp-module-btn" onclick="openApp('belehrung')">Probeer deze module →</button>
       </div>
-      <!-- Module 03: Akte -->
+
+      <!-- 03 + 04 row -->
       <div class="lp-module-card lp-reveal lp-reveal-d1">
         <div class="lp-module-icon">📄</div>
         <div class="lp-module-num">Module 03</div>
@@ -472,7 +465,7 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
         </div>
         <button class="lp-module-btn" onclick="openApp('akte')">Probeer deze module →</button>
       </div>
-      <!-- Module 04: Intake -->
+
       <div class="lp-module-card lp-reveal lp-reveal-d2">
         <div class="lp-module-icon">📋</div>
         <div class="lp-module-num">Module 04</div>
@@ -485,19 +478,29 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
         </div>
         <button class="lp-module-btn" onclick="openApp('intake')">Probeer deze module →</button>
       </div>
-      <!-- Module 05: Dossier -->
-      <div class="lp-module-card lp-reveal lp-reveal-d1">
-        <div class="lp-module-icon">📁</div>
-        <div class="lp-module-num">Module 05</div>
-        <h3 class="lp-module-title">Dossier Statusoverzicht</h3>
-        <p class="lp-module-desc">Real-time inzicht in alle actieve dossiers. Filter op urgentie, notaris of status en zie in één oogopslag waar actie vereist is.</p>
-        <div class="lp-module-features">
-          <div class="lp-module-feature">Urgentiefilter: Normaal / Midden / Urgent</div>
-          <div class="lp-module-feature">Overzicht per notaris en kandidaat-notaris</div>
-          <div class="lp-module-feature">Directe statusupdates per dossier</div>
+
+      <!-- 05 full-width row -->
+      <div class="lp-module-card lp-module-full lp-reveal lp-reveal-d1">
+        <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap">
+          <div style="flex:0 0 auto">
+            <div class="lp-module-icon">📁</div>
+            <div class="lp-module-num">Module 05</div>
+          </div>
+          <div style="flex:1;min-width:260px">
+            <h3 class="lp-module-title" style="margin-bottom:8px">Dossier Statusoverzicht</h3>
+            <p class="lp-module-desc">Real-time inzicht in alle actieve dossiers. Filter op urgentie, notaris of status en zie in één oogopslag waar actie vereist is.</p>
+            <div class="lp-module-features" style="display:flex;flex-wrap:wrap;gap:6px 32px;margin-top:12px">
+              <div class="lp-module-feature">Urgentiefilter: Normaal / Midden / Urgent</div>
+              <div class="lp-module-feature">Overzicht per notaris en kandidaat-notaris</div>
+              <div class="lp-module-feature">Directe statusupdates per dossier</div>
+            </div>
+          </div>
+          <div style="flex:0 0 auto">
+            <button class="lp-module-btn" onclick="openApp('dossier')">Probeer deze module →</button>
+          </div>
         </div>
-        <button class="lp-module-btn" onclick="openApp('dossier')">Probeer deze module →</button>
       </div>
+
     </div></div>
   </div>
 </section>
@@ -1073,13 +1076,14 @@ async function runBelehrung() {
 
   setLoading('b-result-area', 'b-btn', 'Belehrung voorbereiding wordt gegenereerd...');
 
-  const focusInstructie = {
+  const focusInstructies = {
     volledig:    'Analyseer alle relevante aspecten volledig.',
-    erfbelasting:'Focus primair op erfbelasting-risico's en optimalisatie.',
+    erfbelasting:'Focus primair op erfbelasting-risicos en optimalisatie.',
     legitieme:   'Focus op legitieme portie-aanspraken en hoe deze te bespreken.',
     zorg:        'Focus op zorgverzorging, bewind en volmacht-aspecten.',
     relatie:     'Focus op relatiedynamiek, machtsbalans en mogelijke conflicten.'
-  }[belehrungFocus] || '';
+  };
+  const focusInstructie = focusInstructies[belehrungFocus] || '';
 
   const sys = `Je bent een ervaren notaris met 20 jaar expertise in complexe familiezaken. Je taak is om een collega-notaris voor te bereiden op een persoonlijk belehrunggesprek.
 
