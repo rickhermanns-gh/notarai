@@ -227,12 +227,14 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
 /* REVEAL ANIMATION */
 @keyframes lp-fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
 @keyframes lp-fadeIn { from{opacity:0} to{opacity:1} }
-.lp-reveal { opacity:0;transform:translateY(30px);transition:opacity 0.7s,transform 0.7s; }
+.lp-reveal { opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease; }
 .lp-reveal.visible { opacity:1;transform:translateY(0); }
-.lp-reveal-d1 { transition-delay:0.1s; }
-.lp-reveal-d2 { transition-delay:0.2s; }
-.lp-reveal-d3 { transition-delay:0.3s; }
-.lp-reveal-d4 { transition-delay:0.4s; }
+.lp-reveal-d1 { transition-delay:0.08s; }
+.lp-reveal-d2 { transition-delay:0.16s; }
+.lp-reveal-d3 { transition-delay:0.24s; }
+.lp-reveal-d4 { transition-delay:0.32s; }
+/* Fallback: if JS doesn't run, still show content */
+.no-js .lp-reveal { opacity:1;transform:none; }
 
 /* ═══════════════════════════════════════════════════════
    ██ APP STYLES
@@ -1119,19 +1121,27 @@ Focusgebied: ${belehrungFocus}`;
 }
 
 // ── LANDING PAGE ANIMATIONS ───────────────────────────────────────────────────
+// Reveal animation — threshold 0 = fires as soon as 1px enters viewport
 const lpObserver = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
       if (e.target.classList.contains('lp-step')) {
         const idx = Array.from(e.target.parentElement.children).indexOf(e.target);
-        setTimeout(() => e.target.classList.add('visible'), idx * 150);
+        setTimeout(() => e.target.classList.add('visible'), idx * 120);
       } else {
         e.target.classList.add('visible');
       }
+      lpObserver.unobserve(e.target); // stop watching once visible
     }
   });
-}, { threshold: 0.15 });
+}, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+
 document.querySelectorAll('.lp-reveal, .lp-step').forEach(el => lpObserver.observe(el));
+
+// Hard fallback: make everything visible after 1.5s regardless
+setTimeout(() => {
+  document.querySelectorAll('.lp-reveal, .lp-step').forEach(el => el.classList.add('visible'));
+}, 1500);
 
 window.addEventListener('scroll', () => {
   const nav = document.getElementById('lp-nav');
