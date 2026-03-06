@@ -362,6 +362,62 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
   #app-tabs { overflow-x:auto;width:100%; }
   #app-content { padding:16px; }
 }
+
+/* ── PRINT STYLES ── */
+@media print {
+  #lp-nav, #app-header, #app-tabs, #app-footer, .panel, .filter-row, #app-page-desc { display: none !important; }
+  #app-content { padding: 0 !important; }
+  .two-col { display: block !important; }
+  .panel-result { border: none !important; box-shadow: none !important; padding: 0 !important; }
+  .result-actions { display: none !important; }
+  body { background: white !important; color: black !important; font-family: Arial, sans-serif !important; }
+  .result-label { color: #204C8D !important; border-bottom: 2px solid #204C8D; padding-bottom: 8px; margin-bottom: 16px; }
+  .result-text { font-size: 12px !important; line-height: 1.6 !important; color: black !important; }
+  .print-header { display: block !important; }
+}
+.print-header { display: none; }
+
+/* ── RESULT ACTION BUTTONS ── */
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e8eef8;
+}
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.action-btn-primary {
+  background: var(--blue);
+  color: #fff;
+  border: none;
+}
+.action-btn-primary:hover { background: var(--blue2); transform: translateY(-1px); }
+.action-btn-secondary {
+  background: #fff;
+  color: var(--blue);
+  border: 1.5px solid var(--blue);
+}
+.action-btn-secondary:hover { background: var(--blue-bg); transform: translateY(-1px); }
+.action-btn-ghost {
+  background: var(--blue-bg);
+  color: #555;
+  border: 1.5px solid #d0d8ec;
+}
+.action-btn-ghost:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-1px); }
 </style>
 </head>
 <body>
@@ -910,14 +966,83 @@ function setLoading(areaId, btnId, msg) {
 function resetBtn(id, label) {
   const b = document.getElementById(id); b.disabled=false; b.textContent=label;
 }
-function showResult(areaId, label, text) {
+function showResult(areaId, label, text, moduleType) {
   const safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const escaped = text.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+
+  // Build action buttons per module
+  const actions = buildActions(moduleType, text, label, escaped);
+
   document.getElementById(areaId).innerHTML = `
     <div class="panel-result">
+      <div class="print-header" style="margin-bottom:16px">
+        <div style="font-size:18px;font-weight:800;color:#204C8D">NotariAI</div>
+        <div style="font-size:11px;color:#888">${label} · ${new Date().toLocaleDateString('nl-NL', {day:'2-digit',month:'long',year:'numeric'})}</div>
+      </div>
       <div class="result-label">${label}</div>
       <div class="result-text">${safe}</div>
-      <button class="btn-secondary" onclick="navigator.clipboard?.writeText(\`${text.replace(/`/g,'\\`')}\`).then(()=>alert('Gekopieerd!'))">📋 Kopieer tekst</button>
+      <div class="result-actions">${actions}</div>
     </div>`;
+}
+
+function buildActions(moduleType, text, label, escaped) {
+  const copy   = `<button class="action-btn action-btn-secondary" onclick="navigator.clipboard?.writeText(\`${escaped}\`).then(()=>this.textContent='✅ Gekopieerd!')">📋 Kopieer</button>`;
+  const print  = `<button class="action-btn action-btn-ghost" onclick="window.print()">🖨️ Print</button>`;
+  const dl     = `<button class="action-btn action-btn-ghost" onclick="downloadTxt(\`${escaped}\`, '${label}')">⬇️ Download .txt</button>`;
+
+  if (moduleType === 'wwft') {
+    const emailBody = encodeURIComponent('Wwft Screeningsresultaat\n\n' + text);
+    const mailto = `<a class="action-btn action-btn-primary" href="mailto:?subject=Wwft%20Screening%20NotariAI&body=${emailBody}">✉️ Stuur naar notaris</a>`;
+    const dosExport = `<button class="action-btn action-btn-ghost" onclick="downloadDossier(\`${escaped}\`, 'wwft')">📂 Export dossiernotitie</button>`;
+    return `${mailto}${copy}${dosExport}${print}`;
+  }
+
+  if (moduleType === 'akte') {
+    const emailBody = encodeURIComponent('Geachte ' + text.substring(0,40) + '...\n\n' + text);
+    const mailto = `<a class="action-btn action-btn-primary" href="mailto:?subject=Toelichting%20op%20uw%20akte%20-%20NotariAI&body=${emailBody}">✉️ Maak e-mail aan cliënt</a>`;
+    const dosExport = `<button class="action-btn action-btn-ghost" onclick="downloadDossier(\`${escaped}\`, 'akte')">📂 Export voor dossiersysteem</button>`;
+    return `${mailto}${copy}${dosExport}${print}`;
+  }
+
+  if (moduleType === 'intake') {
+    const emailBody = encodeURIComponent('Intake Dossier - NotariAI\n\n' + text);
+    const mailto = `<a class="action-btn action-btn-primary" href="mailto:?subject=Intake%20Dossier%20-%20NotariAI&body=${emailBody}">✉️ Stuur naar notaris</a>`;
+    const csvBtn  = `<button class="action-btn action-btn-secondary" onclick="downloadDossier(\`${escaped}\`, 'intake')">📋 Export inleesbestand</button>`;
+    return `${mailto}${csvBtn}${copy}${print}`;
+  }
+
+  if (moduleType === 'belehrung') {
+    const emailBody = encodeURIComponent('Belehrung Voorbereiding - NotariAI\n\n' + text);
+    const mailto = `<a class="action-btn action-btn-primary" href="mailto:?subject=Belehrung%20Voorbereiding%20-%20NotariAI&body=${emailBody}">✉️ Mail gespreksvoorbereiding</a>`;
+    const dosExport = `<button class="action-btn action-btn-ghost" onclick="downloadDossier(\`${escaped}\`, 'belehrung')">📂 Export voor dossier</button>`;
+    return `${mailto}${copy}${dosExport}${print}`;
+  }
+
+  return `${copy}${print}`;
+}
+
+function downloadTxt(text, label) {
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = 'NotariAI-' + label.replace(/[^a-zA-Z0-9]/g,'-').substring(0,40) + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadDossier(text, moduleType) {
+  // Creates a structured plain-text export formatted for easy import
+  const now  = new Date().toLocaleDateString('nl-NL');
+  const types = { wwft:'Wwft-Screening', akte:'Cliëntuitleg-Akte', intake:'Intake-Dossier', belehrung:'Belehrung-Voorbereiding' };
+  const header = `NotariAI Export\nType: ${types[moduleType] || moduleType}\nDatum: ${now}\nGegenereerd door: NotariAI Backoffice Suite\n${'─'.repeat(60)}\n\n`;
+  const blob = new Blob([header + text], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `NotariAI-${types[moduleType] || moduleType}-${now.replace(/\//g,'-')}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ── WWFT ──────────────────────────────────────────────────────────────────────
@@ -934,7 +1059,7 @@ async function runWwft() {
 Schrijf professioneel, beknopt en in het Nederlands.`;
   const msg=`Cliënt: ${naam}, geboren ${dob}, nationaliteit: ${nat}. Bron van middelen: ${bron}. UBO-structuur: ${ubo}. Doel: ${doel}.`;
   const text=await callClaude(sys,msg);
-  showResult('w-result-area','Screeningsresultaat',text);
+  showResult('w-result-area','Screeningsresultaat',text,'wwft');
   resetBtn('w-btn','▶ Start Wwft Screening');
 }
 
@@ -1001,7 +1126,7 @@ async function runAkte() {
 - Taal: Nederlands`;
   const msg=`Naam: ${naam||'Cliënt'}. Type: ${type}.\n\nAkte:\n${tekst.substring(0,8000)}`;
   const text=await callClaude(sys,msg);
-  showResult('a-result-area','Cliëntuitleg — Klaar voor verzending',text);
+  showResult('a-result-area','Cliëntuitleg — Klaar voor verzending',text,'akte');
   resetBtn('a-btn','📄 Genereer Cliëntuitleg');
 }
 
@@ -1042,7 +1167,7 @@ AANDACHTSPUNTEN
 Professioneel, in het Nederlands.`;
   const msg=`Rechtsgebied: ${activeRechtsgebied}. Cliënt: ${naam}, tel: ${tel}, email: ${email}. Situatie: ${situatie}. Vraag: ${vraag}`;
   const text=await callClaude(sys,msg);
-  showResult('i-result-area','Gegenereerd Intake Dossier',text);
+  showResult('i-result-area','Gegenereerd Intake Dossier',text,'intake');
   resetBtn('i-btn','📂 Genereer Intake Dossier');
 }
 
@@ -1161,7 +1286,7 @@ Bijzondere wensen: ${wensen || 'Geen opgegeven'}
 Focusgebied: ${belehrungFocus}`;
 
   const text = await callClaude(sys, msg);
-  showResult('b-result-area', 'Belehrung Voorbereiding — Gereed voor gesprek', text);
+  showResult('b-result-area', 'Belehrung Voorbereiding — Gereed voor gesprek', text, 'belehrung');
   resetBtn('b-btn', '🎯 Genereer Belehrung Voorbereiding');
 }
 
