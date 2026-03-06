@@ -134,6 +134,7 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
 
 /* MODULES GRID */
 .lp-modules-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin-top:60px;border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden; }
+.lp-module-card.full-width { grid-column: 1 / -1; background: linear-gradient(135deg, #172a4a, #1a3360); border-top: 2px solid rgba(200,168,75,0.3); }
 .lp-module-card { background:var(--navy2);padding:44px 40px;transition:background 0.3s;cursor:default;position:relative;overflow:hidden; }
 .lp-module-card::after { content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);transform:scaleX(0);transform-origin:left;transition:transform 0.4s; }
 .lp-module-card:hover { background:#172a4a; }
@@ -399,7 +400,7 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
 
 <!-- STATS -->
 <div id="lp-stats">
-  <div class="lp-stat lp-reveal"><div class="lp-stat-num">4</div><div class="lp-stat-label">AI-modules</div></div>
+  <div class="lp-stat lp-reveal"><div class="lp-stat-num">5</div><div class="lp-stat-label">AI-modules</div></div>
   <div class="lp-stat lp-reveal lp-reveal-d1"><div class="lp-stat-num">−70%</div><div class="lp-stat-label">Tijd op intake</div></div>
   <div class="lp-stat lp-reveal lp-reveal-d2"><div class="lp-stat-num">AVG</div><div class="lp-stat-label">Volledig compliant</div></div>
   <div class="lp-stat lp-reveal lp-reveal-d3"><div class="lp-stat-num">KNB</div><div class="lp-stat-label">Beroepsnormen</div></div>
@@ -461,6 +462,30 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
           <div class="lp-module-feature">Directe statusupdates per dossier</div>
         </div>
         <button class="lp-module-btn" onclick="openApp('dossier')">Probeer deze module →</button>
+      </div>
+      <div class="lp-module-card full-width lp-reveal lp-reveal-d1">
+        <div style="display:flex;align-items:flex-start;gap:32px;flex-wrap:wrap">
+          <div style="flex:0 0 auto">
+            <div class="lp-module-icon" style="background:rgba(200,168,75,0.15);border-color:rgba(200,168,75,0.4)">🎯</div>
+            <div class="lp-module-num">Module 05</div>
+            <div style="display:inline-block;margin-top:8px;font-size:9px;font-weight:700;color:var(--gold);background:rgba(200,168,75,0.12);border:1px solid rgba(200,168,75,0.3);border-radius:4px;padding:3px 8px;text-transform:uppercase;letter-spacing:1.5px">Pilot · Nieuw</div>
+          </div>
+          <div style="flex:1;min-width:260px">
+            <h3 class="lp-module-title">Belehrung Voorbereider</h3>
+            <p class="lp-module-desc">AI analyseert familiedynamiek, vermogenssituatie en bekende spanningspunten om de notaris te voorzien van een gepersonaliseerd vraagscript en risicolijst vóór het persoonlijke belehrunggesprek. De gap die geen enkel systeem nu overbrugt: context-analyse over families en cliëntnetwerken.</p>
+            <div class="lp-module-features" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:14px">
+              <div class="lp-module-feature">Risicosignalen uit familiedynamiek</div>
+              <div class="lp-module-feature">Gepersonaliseerd vraagscript per gezin</div>
+              <div class="lp-module-feature">Patronen: ongelijke vermogens → erfbelasting</div>
+              <div class="lp-module-feature">Aandachtspunten legitieme portie &amp; zorg</div>
+              <div class="lp-module-feature">Juridische ankerpunten per zaaktype</div>
+              <div class="lp-module-feature">Focusgebied instelbaar per gesprek</div>
+            </div>
+          </div>
+          <div style="flex:0 0 auto;align-self:center">
+            <button class="lp-module-btn" style="white-space:nowrap" onclick="openApp('belehrung')">Probeer deze module →</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -607,6 +632,7 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
     <button class="tab-btn" onclick="switchTab('akte',this)"><span class="tab-icon">📄</span><span>Akte Samenvatter</span><span class="tab-sub">Cliëntuitleg AI</span></button>
     <button class="tab-btn" onclick="switchTab('intake',this)"><span class="tab-icon">📋</span><span>IntakeFlow</span><span class="tab-sub">Vastgoed &amp; Familie</span></button>
     <button class="tab-btn" onclick="switchTab('dossier',this)"><span class="tab-icon">📁</span><span>Dossier Status</span><span class="tab-sub">Overzicht &amp; Voortgang</span></button>
+    <button class="tab-btn" onclick="switchTab('belehrung',this)"><span class="tab-icon">🎯</span><span>Belehrung Prep</span><span class="tab-sub">Familiedynamiek AI</span></button>
   </div>
 </div>
 
@@ -707,6 +733,64 @@ body { font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
     <div id="dossier-list" class="dossier-list"></div>
     <div id="dossier-stats" class="stats-bar"></div>
   </div>
+
+  <!-- BELEHRUNG -->
+  <div id="mod-belehrung" class="app-module">
+    <div class="two-col">
+      <div class="panel" style="flex:1.1">
+        <div class="section-label">Cliëntprofiel &amp; Familiedynamiek</div>
+
+        <div class="field"><label>Namen cliënten</label>
+          <input id="b-namen" placeholder="Bijv. Jan en Maria de Vries (echtpaar, gehuwd 1998)"></div>
+
+        <div class="field"><label>Type akte / Zaaktype</label>
+          <select id="b-type">
+            <option value="testament">Testament</option>
+            <option value="huwelijkse voorwaarden">Huwelijkse voorwaarden</option>
+            <option value="samenlevingscontract">Samenlevingscontract</option>
+            <option value="schenking">Schenking</option>
+            <option value="koopakte vastgoed">Koopakte vastgoed</option>
+            <option value="oprichting BV">Oprichting BV</option>
+            <option value="erfrecht / nalatenschap">Erfrecht / Nalatenschap</option>
+          </select>
+        </div>
+
+        <div class="field"><label>Familisamenstelling</label>
+          <textarea id="b-familie" rows="3" placeholder="Bijv: 2 kinderen uit huidig huwelijk, Jan heeft 1 kind uit eerdere relatie (Emma, 19jr). Maria's ouders nog in leven."></textarea></div>
+
+        <div class="field"><label>Vermogenssituatie</label>
+          <textarea id="b-vermogen" rows="3" placeholder="Bijv: Jan heeft eigen woning (€420k), spaargeld €80k. Maria heeft schulden €25k. Ongelijke inbreng. Zakelijke belangen Jan in BV (50% aandeelhouder)."></textarea></div>
+
+        <div class="field"><label>Bekende spanningspunten of risico's</label>
+          <textarea id="b-spanningen" rows="3" placeholder="Bijv: Eerder conflict over erfenis broer Jan. Maria wil meer bescherming bij overlijden. Emma (stiefkind) heeft mogelijk legitimaire aanspraken."></textarea></div>
+
+        <div class="field"><label>Bijzondere wensen of omstandigheden</label>
+          <input id="b-wensen" placeholder="Bijv: Cliënten willen regeling voor zorgkosten op latere leeftijd"></div>
+
+        <div style="margin-bottom:14px">
+          <div style="font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">Focusgebied voor de belehrung</div>
+          <div class="tag-group" id="focus-group">
+            <button class="tag-btn-small active" onclick="setBelehrungFocus('volledig',this)">🔍 Volledig</button>
+            <button class="tag-btn-small" onclick="setBelehrungFocus('erfbelasting',this)">💰 Erfbelasting</button>
+            <button class="tag-btn-small" onclick="setBelehrungFocus('legitieme',this)">⚖️ Legitieme portie</button>
+            <button class="tag-btn-small" onclick="setBelehrungFocus('zorg',this)">🏥 Zorgverzorging</button>
+            <button class="tag-btn-small" onclick="setBelehrungFocus('relatie',this)">👥 Relatiedynamiek</button>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="b-btn" onclick="runBelehrung()">🎯 Genereer Belehrung Voorbereiding</button>
+      </div>
+
+      <div id="b-result-area">
+        <div class="panel-empty">
+          <div class="big-icon">🎯</div>
+          <div class="empty-title">Vul het cliëntprofiel in voor een gepersonaliseerde gespreksvoorbereiding.</div>
+          <div class="empty-sub">AI analyseert familiedynamiek, vermogenssituatie en risicosignalen en genereert een vraagscript + risicolijst voor de notaris.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- APP FOOTER -->
@@ -728,7 +812,8 @@ const TABS_META = {
   wwft:    { title:'🛡️ Wwft / UBO',      desc:'Voer cliëntgegevens in voor automatische Wwft-screening en UBO-analyse.' },
   akte:    { title:'📄 Akte Samenvatter', desc:'Plak een concept-akte of upload een bestand en genereer direct een cliëntuitleg.' },
   intake:  { title:'📋 IntakeFlow',       desc:'Leg een nieuwe cliëntintake vast en laat AI een volledig intake-dossier samenstellen.' },
-  dossier: { title:'📁 Dossier Status',   desc:'Real-time overzicht van actieve dossiers, prioriteiten en voortgang.' },
+  dossier:    { title:'📁 Dossier Status',      desc:'Real-time overzicht van actieve dossiers, prioriteiten en voortgang.' },
+  belehrung:  { title:'🎯 Belehrung Voorbereider', desc:'AI analyseert familiedynamiek en vermogenssituatie voor een gepersonaliseerd vraagscript en risicooverzicht.' },
 };
 
 function openApp(tab) {
@@ -957,6 +1042,82 @@ function renderDossiers() {
     <span><strong style="color:#2e7d32">${DOSSIERS.filter(d=>d.urgentie==='laag').length}</strong> normaal</span>`;
 }
 
+
+// ── BELEHRUNG MODULE ──────────────────────────────────────────────────────────
+let belehrungFocus = 'volledig';
+function setBelehrungFocus(val, el) {
+  belehrungFocus = val;
+  document.querySelectorAll('#focus-group .tag-btn-small').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function runBelehrung() {
+  const namen    = document.getElementById('b-namen').value;
+  const type     = document.getElementById('b-type').value;
+  const familie  = document.getElementById('b-familie').value;
+  const vermogen = document.getElementById('b-vermogen').value;
+  const spanning = document.getElementById('b-spanningen').value;
+  const wensen   = document.getElementById('b-wensen').value;
+  if (!namen || !familie) return;
+
+  setLoading('b-result-area', 'b-btn', 'Belehrung voorbereiding wordt gegenereerd...');
+
+  const focusInstructie = {
+    volledig:    'Analyseer alle relevante aspecten volledig.',
+    erfbelasting:'Focus primair op erfbelasting-risico's en optimalisatie.',
+    legitieme:   'Focus op legitieme portie-aanspraken en hoe deze te bespreken.',
+    zorg:        'Focus op zorgverzorging, bewind en volmacht-aspecten.',
+    relatie:     'Focus op relatiedynamiek, machtsbalans en mogelijke conflicten.'
+  }[belehrungFocus] || '';
+
+  const sys = `Je bent een ervaren notaris met 20 jaar expertise in complexe familiezaken. Je taak is om een collega-notaris voor te bereiden op een persoonlijk belehrunggesprek.
+
+Genereer een gestructureerde gespreksvoorbereiding in dit exacte formaat:
+
+═══════════════════════════════════════════
+BELEHRUNG VOORBEREIDING
+Cliënt(en): [namen] | Type: [akte]
+═══════════════════════════════════════════
+
+SITUATIEANALYSE
+[Kernanalyse van de familiedynamiek en vermogenssituatie in 3-4 zinnen. Identificeer de centrale spanning of het risico.]
+
+RISICOSIGNALEN 🔴
+[3-5 concrete risicosignalen met toelichting. Gebruik het format:
+• RISICO: [naam] — [uitleg waarom dit risico bestaat en wat de impact kan zijn]]
+
+VRAAGSCRIPT VOOR DE BELEHRUNG
+[8-12 specifieke vragen die de notaris moet stellen, genummerd. 
+Vragen moeten:
+- Open zijn (geen ja/nee)
+- Gericht zijn op het blootleggen van risico's
+- Sensitief zijn voor de relatiedinamiek
+- Juridisch relevant zijn voor dit zaaktype]
+
+AANDACHTSPUNTEN VOOR HET GESPREK
+[3-5 praktische tips voor de gespreksvoering, bijv. hoe om te gaan met spanningen, wie als eerste te spreken, etc.]
+
+MOGELIJKE VERVOLGACTIES
+[2-4 concrete vervolgstappen als bepaalde risico's bevestigd worden]
+
+JURIDISCHE ANKERPUNTEN
+[Relevante wetsartikelen of juridische begrippen die in dit gesprek relevant zijn]
+
+Schrijf professioneel, praktisch en in het Nederlands. ${focusInstructie}`;
+
+  const msg = `Cliënten: ${namen}
+Type akte: ${type}
+Familiesamenstelling: ${familie}
+Vermogenssituatie: ${vermogen}
+Bekende spanningspunten: ${spanning || 'Geen opgegeven'}
+Bijzondere wensen: ${wensen || 'Geen opgegeven'}
+Focusgebied: ${belehrungFocus}`;
+
+  const text = await callClaude(sys, msg);
+  showResult('b-result-area', 'Belehrung Voorbereiding — Gereed voor gesprek', text);
+  resetBtn('b-btn', '🎯 Genereer Belehrung Voorbereiding');
+}
+
 // ── LANDING PAGE ANIMATIONS ───────────────────────────────────────────────────
 const lpObserver = new IntersectionObserver(entries => {
   entries.forEach(e => {
@@ -982,7 +1143,7 @@ window.addEventListener('scroll', () => {
 // ── HASH-BASED DEEP LINK ──────────────────────────────────────────────────────
 (function() {
   const hash = window.location.hash.replace('#','');
-  if (['wwft','akte','intake','dossier'].includes(hash)) openApp(hash);
+  if (['wwft','akte','intake','dossier','belehrung'].includes(hash)) openApp(hash);
 })();
 </script>
 </body>
